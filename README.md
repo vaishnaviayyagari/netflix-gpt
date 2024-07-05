@@ -4,7 +4,13 @@
 -header
 - build our login form
 -Sign up form
-
+-Form Validation
+- Use Ref hook
+- Firebase set up
+- Deploying our app to production
+- Create Signup User account
+- Implement Sign in user
+- Created redux store with userSlice
 
 #Featues
  - Login
