@@ -26,6 +26,7 @@ const Login = () => {
                 .then((userCredential) => {
                     // Signed up 
                     const user = userCredential.user;
+                    navigate("/");
                     //console.log(user);
                     // ...
                 })
@@ -33,7 +34,7 @@ const Login = () => {
                     const errorCode = error.code;
                     const errorMessage = error.message;
                     console.log(errorCode + " " + errorMessage);
-                    navigate("/");
+                   
                     // ..
                 });
         }else {
