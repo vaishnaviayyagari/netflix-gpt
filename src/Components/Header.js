@@ -1,27 +1,54 @@
 import { useNavigate } from "react-router-dom";
 import { auth } from "../utils/firebase";
-import { signOut } from "firebase/auth";
-import { useDispatch } from "react-redux";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { addUser,removeUser } from "../utils/userSlice";
+import { LOGO } from "../utils/constants";
+
 
 const Header  = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const user = useSelector(store=>store.user);
+
     const handleSignOut = () =>{
         signOut(auth).then(() => {
-            navigate("/");
+            
           }).catch((error) => {
             // An error happened.
             navigate("/error");
           });
     }
+
+    useEffect(()=>{
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+              // User is signed in, see docs for a list of available properties
+              // https://firebase.google.com/docs/reference/js/auth.user
+              const {uid,email,displayName,photoURL} = user;
+              dispatch(addUser({uid:uid,email:email,displayName:displayName,photoURL:photoURL}));
+              navigate("/browse");
+              // ...
+            } else {
+              // User is signed out
+              dispatch(removeUser());
+              navigate("/");
+            }
+          });
+          return ()=>unsubscribe();
+    },[])
     return(
         <div className="absolute px-8 py-2 bg-gradient-to-b from from-black z-10 w-screen flex justify-between">
-            <img className="w-40" src="https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png" alt="logo"></img>
+            <img className="w-40" src={LOGO} alt="logo"></img>
+            {user &&
             <div>
                 <img alt="usericon"
-                src="https://occ-0-4994-2164.1.nflxso.net/dnm/api/v6/vN7bi_My87NPKvsBoib006Llxzg/AAAABeuqjuQsRgqEDlibtJTI5BMf8IxhLlLOeIT6xI4TL57mqv7XHja43gx02S8pZVe8JNGRQXjnrUk1VcsTXqi83tFKPI6OR3k.png?r=bd7"></img>
+                src={user?.photoURL}/>
                 <button onClick={handleSignOut} className="font-bold text-white">Sign Out </button>
             </div>
+            }
+            
         </div>
           
         
